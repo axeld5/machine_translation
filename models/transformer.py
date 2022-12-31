@@ -4,7 +4,7 @@ import numpy as np
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments, Seq2SeqTrainer, DataCollatorForSeq2Seq, pipeline
 from typing import List
 
-from .utils import postprocess_text
+from .transformer_utils import postprocess_text
 
 class TransformerMT:
 
@@ -22,7 +22,7 @@ class TransformerMT:
         model_inputs = self.tokenizer(inputs, text_target=targets, max_length=128, truncation=True)
         return model_inputs
 
-    def train(self, dataset) -> None:
+    def train(self, dataset, n_iters:int=2) -> None:
         tokenized_dataset = dataset.map(self.preprocess_function, batched=True)
         train_dataset = tokenized_dataset["train"]
         eval_dataset = tokenized_dataset["test"]
@@ -35,7 +35,7 @@ class TransformerMT:
             per_device_eval_batch_size=16,
             weight_decay=0.01,
             save_total_limit=3,
-            num_train_epochs=2,
+            num_train_epochs=n_iters,
             predict_with_generate=True,
             #fp16=True,
         )
