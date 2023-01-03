@@ -1,9 +1,4 @@
 from datasets import load_dataset, ReadInstruction
-import time 
-import random
-import torch
-import torch.nn as nn
-from torch import optim
 from models.lstm import LSTMMT
 
 if __name__ == "__main__":
