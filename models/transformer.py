@@ -22,10 +22,9 @@ class TransformerMT:
         model_inputs = self.tokenizer(inputs, text_target=targets, max_length=128, truncation=True)
         return model_inputs
 
-    def train(self, dataset, n_iters:int=2) -> None:
-        tokenized_dataset = dataset.map(self.preprocess_function, batched=True)
-        train_dataset = tokenized_dataset["train"]
-        eval_dataset = tokenized_dataset["test"]
+    def train(self, train_dataset, eval_dataset, n_iters:int=2) -> None:
+        train_tokenized = train_dataset.map(self.preprocess_function, batched=True)
+        eval_tokenized = eval_dataset.map(self.preprocess_function, batched=True)
         data_collator = DataCollatorForSeq2Seq(tokenizer=self.tokenizer, model=self.model)
         training_args = Seq2SeqTrainingArguments(
             output_dir=".saved_models",
@@ -42,8 +41,8 @@ class TransformerMT:
         trainer = Seq2SeqTrainer(
             model=self.model,
             args=training_args,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
+            train_dataset=train_tokenized,
+            eval_dataset=eval_tokenized,
             tokenizer=self.tokenizer,
             data_collator=data_collator,
             compute_metrics=self.compute_metrics,
