@@ -53,7 +53,7 @@ class TransformerMT:
         translator = pipeline("translation_en_to_fr", model=self.model.to("cpu"), tokenizer=self.tokenizer)
         predictions = [0]*len(test_dataset)
         for i in range(len(test_dataset)):
-            predictions[i] = translator(self.prefix + test_dataset[i])
+            predictions[i] = translator(self.prefix + test_dataset[i])[0]["translation_text"]
         return predictions
 
     def load_model(self):
@@ -68,9 +68,7 @@ class TransformerMT:
 
         labels = np.where(labels != -100, labels, self.tokenizer.pad_token_id)
         decoded_labels = self.tokenizer.batch_decode(labels, skip_special_tokens=True)
-
         decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
-
         result = metric.compute(predictions=decoded_preds, references=decoded_labels)
         result = {"bleu": result["score"]}
 
