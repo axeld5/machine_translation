@@ -12,16 +12,18 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
     lstm_model.load_model()
-    lstm_model.train(train_dataset, 100000)
+    #lstm_model.train(train_dataset, 100000)
 
     sentence = test_dataset[0]["translation"]["en"]
     lstm_predictions = lstm_model.predict([sentence])
     print(normalizeString(sentence))
     print(lstm_predictions)
     test = []
+    version = []
     for i in range(len(test_dataset)):
         test.append(normalizeString(test_dataset[i]["translation"]["en"]))
+        version.append(normalizeString(test_dataset[i]["translation"]["fr"]))
     lstm_predictions = lstm_model.predict(test)
     
-    lstm_score = sacrebleu_metric(test, lstm_predictions)
+    lstm_score = sacrebleu_metric(version, lstm_predictions)
     print(lstm_score)
