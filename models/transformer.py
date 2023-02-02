@@ -1,8 +1,10 @@
 import evaluate
 import numpy as np
 
+from joblib import dump, load
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments, Seq2SeqTrainer, DataCollatorForSeq2Seq, pipeline
 from typing import List
+
 
 from .transformer_utils import postprocess_text
 
@@ -27,7 +29,7 @@ class TransformerMT:
         eval_tokenized = eval_dataset.map(self.preprocess_function, batched=True)
         data_collator = DataCollatorForSeq2Seq(tokenizer=self.tokenizer, model=self.model)
         training_args = Seq2SeqTrainingArguments(
-            output_dir=".saved_models",
+            output_dir="models/saved_models/transf",
             evaluation_strategy="epoch",
             learning_rate=2e-5,
             per_device_train_batch_size=16,
@@ -48,16 +50,20 @@ class TransformerMT:
             compute_metrics=self.compute_metrics,
         )
         trainer.train()
+        dump(self.model, "models/saved_models/transformer.joblib")
 
     def predict(self, test_dataset:List[str]) -> None:
         translator = pipeline("translation_en_to_fr", model=self.model.to("cpu"), tokenizer=self.tokenizer)
         predictions = [0]*len(test_dataset)
+        print(len(test_dataset))
         for i in range(len(test_dataset)):
             predictions[i] = translator(self.prefix + test_dataset[i])[0]["translation_text"]
+            if i%1000 == 0:
+                print(i)
         return predictions
 
     def load_model(self):
-        pass 
+        self.model = load("models/saved_models/transformer.joblib")
 
     def compute_metrics(self, eval_preds):
         metric = evaluate.load("sacrebleu")

@@ -14,4 +14,6 @@ def visualize(model_perf:Dict[str, float]) -> None:
     ax.set_title("Bleu score for each model")
     plt.show() 
 
-visualize({"LSTM": 0.9, "ConvS2S": 0.8})
+if __name__ == "__main__":
+    model_perf = {"LSTM":35, "ConvS2S":37, "Transformer":40}
+    visualize(model_perf)

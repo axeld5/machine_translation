@@ -1,19 +1,27 @@
 from datasets import load_dataset, ReadInstruction
 from models.lstm import LSTMMT
 from bleu_metric import sacrebleu_metric
+from models.lstm_utils import normalizeString
 
 if __name__ == "__main__":
-    #dataset = load_dataset("wmt14", "fr-en")
-    #remove everything after en-fr when using it for real
-    dataset = load_dataset("opus_books", "en-fr", split=ReadInstruction("train",from_=11, to=12, unit="%", rounding="pct1_dropremainder"))
-    dataset = dataset.train_test_split(test_size=0.2)
-
+    dataset = load_dataset("tatoeba", lang1 = "en", lang2 = "fr", split=ReadInstruction("train",from_=0, to=100, unit="%", rounding="pct1_dropremainder"))
+    lstm_model = LSTMMT(hidden_size=1024, max_length=500)
+    lstm_model.build_language(dataset)
+    lstm_model.init_models()
+    dataset = dataset.train_test_split(test_size=0.01)
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
-    print(list(dataset["train"][0]["translation"].values()))
+    lstm_model.load_model()
+    lstm_model.train(train_dataset, 100000)
+
+    sentence = test_dataset[0]["translation"]["en"]
+    lstm_predictions = lstm_model.predict([sentence])
+    print(normalizeString(sentence))
+    print(lstm_predictions)
+    test = []
+    for i in range(len(test_dataset)):
+        test.append(normalizeString(test_dataset[i]["translation"]["en"]))
+    lstm_predictions = lstm_model.predict(test)
     
-    model = LSTMMT()
-    model.train(train_dataset, 500)
-    test_dataset = [train_dataset[i]["translation"]["en"] for i in range(100)]
-    predictions = model.predict(test_dataset)
-    print(sacrebleu_metric(test_dataset, predictions))
+    lstm_score = sacrebleu_metric(test, lstm_predictions)
+    print(lstm_score)
