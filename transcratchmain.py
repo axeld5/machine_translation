@@ -14,9 +14,11 @@ if __name__ == "__main__":
     scratch_transfo_predictions = scratch_transfo_model.predict([sentence])
     print(scratch_transfo_predictions)
     test = []
+    version = []
     for i in range(len(test_dataset)):
         test.append(test_dataset[i]["translation"]["en"])
+        version.append(test_dataset[i]["translation"]["fr"])
     scratch_transfo_predictions = scratch_transfo_model.predict(test)
     
-    scratch_transfo_score = sacrebleu_metric(test, scratch_transfo_predictions)
+    scratch_transfo_score = sacrebleu_metric(version, scratch_transfo_predictions)
     print(scratch_transfo_score)

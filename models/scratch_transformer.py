@@ -44,6 +44,7 @@ class ScratchTransfoNMT:
             train_loss = self.train_epoch(train_iter, optimizer)
             end_time = timer()
             print((f"Epoch: {epoch}, Train loss: {train_loss:.3f}, "f"Epoch time = {(end_time - start_time):.3f}s"))
+        self.save_model()
         
     def save_model(self) -> None:
         torch.save(self.model.state_dict(), 'models/saved_models/scratch_transfo_weights.pth')  
