@@ -24,7 +24,7 @@ class TransformerMT:
         model_inputs = self.tokenizer(inputs, text_target=targets, max_length=128, truncation=True)
         return model_inputs
 
-    def train(self, train_dataset, eval_dataset, n_iters:int=2) -> None:
+    def train(self, train_dataset, eval_dataset, n_iters:int=2, suffix="") -> None:
         train_tokenized = train_dataset.map(self.preprocess_function, batched=True)
         eval_tokenized = eval_dataset.map(self.preprocess_function, batched=True)
         data_collator = DataCollatorForSeq2Seq(tokenizer=self.tokenizer, model=self.model)
@@ -50,7 +50,7 @@ class TransformerMT:
             compute_metrics=self.compute_metrics,
         )
         trainer.train()
-        dump(self.model, "models/saved_models/transformer.joblib")
+        dump(self.model, "models/saved_models/transformer"+suffix+".joblib")
 
     def predict(self, test_dataset:List[str]) -> None:
         translator = pipeline("translation_en_to_fr", model=self.model.to("cpu"), tokenizer=self.tokenizer)
@@ -62,8 +62,8 @@ class TransformerMT:
                 print(i)
         return predictions
 
-    def load_model(self):
-        self.model = load("models/saved_models/transformer.joblib")
+    def load_model(self, suffix=""):
+        self.model = load("models/saved_models/transformer"+suffix+".joblib")
 
     def compute_metrics(self, eval_preds):
         metric = evaluate.load("sacrebleu")

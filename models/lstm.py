@@ -31,7 +31,7 @@ class LSTMMT:
         self.encoder = EncoderRNN(self.input_lang.n_words, self.hidden_size, self.device).to(self.device)
         self.decoder = AttnDecoderRNN(self.hidden_size, self.output_lang.n_words, self.device, self.dropout_p, self.max_length).to(self.device)
 
-    def train(self, train_dataset, n_iters:int=5000) -> None: 
+    def train(self, train_dataset, n_iters:int=5000, suffix="") -> None: 
         _, _, train_pairs = prepareData("en", "fr", train_dataset)
 
         print_every = n_iters//10
@@ -67,12 +67,17 @@ class LSTMMT:
                 plot_loss_avg = plot_loss_total / plot_every
                 plot_losses.append(plot_loss_avg)
                 plot_loss_total = 0
-        self.save_model()
+        self.save_model(suffix)
         showPlot(plot_losses)
     
-    def save_model(self):
-        torch.save(self.encoder.state_dict(), 'models/saved_models/encoder_weights.pth')
-        torch.save(self.decoder.state_dict(), 'models/saved_models/decoder_weights.pth')
+    def save_model(self, suffix="") -> None:
+        torch.save(self.encoder.state_dict(), 'models/saved_models/encoder_weights'+suffix+'.pth')
+        torch.save(self.decoder.state_dict(), 'models/saved_models/decoder_weights'+suffix+'.pth')
+    
+    
+    def load_model(self, suffix="") -> None:
+        self.encoder.load_state_dict(torch.load('models/saved_models/encoder_weights'+suffix+'.pth'))
+        self.decoder.load_state_dict(torch.load('models/saved_models/decoder_weights'+suffix+'.pth'))
     
     def train_step(self, input_tensor, target_tensor, encoder_optimizer, decoder_optimizer,
         criterion, teacher_forcing_ratio:float=0.5):
@@ -167,7 +172,3 @@ class LSTMMT:
                 decoder_input = topi.squeeze().detach()
             decoded_sentence = ' '.join(decoded_words[:len(decoded_words)-1])
             return decoded_sentence
-
-    def load_model(self) -> None:
-        self.encoder.load_state_dict(torch.load('models/saved_models/encoder_weights.pth'))
-        self.decoder.load_state_dict(torch.load('models/saved_models/decoder_weights.pth'))
