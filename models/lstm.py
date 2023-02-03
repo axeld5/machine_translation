@@ -12,21 +12,27 @@ from .lstm_models import EncoderRNN, AttnDecoderRNN
 class LSTMMT:
 
     def __init__(self, device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"), 
-            hidden_size:int=256, max_length:int=500) -> None:
+            hidden_size:int=256, max_length:int=20) -> None:
         self.SOS_token = 0
         self.EOS_token = 1 
         self.device = device
         self.hidden_size = hidden_size
         self.max_length = max_length
+        self.dropout_p = 0.1
         self.input_lang = None 
         self.output_lang = None
         self.encoder = None
         self.decoder = None
-
-    def train(self, dataset, n_iters:int=5000) -> None: 
+    
+    def build_language(self, dataset) -> None:
         self.input_lang, self.output_lang, pairs = prepareData("en", "fr", dataset)
+    
+    def init_models(self) -> None:
         self.encoder = EncoderRNN(self.input_lang.n_words, self.hidden_size, self.device).to(self.device)
-        self.decoder = AttnDecoderRNN(self.hidden_size, self.output_lang.n_words, self.device, dropout_p=0.1).to(self.device)
+        self.decoder = AttnDecoderRNN(self.hidden_size, self.output_lang.n_words, self.device, self.dropout_p, self.max_length).to(self.device)
+
+    def train(self, train_dataset, n_iters:int=5000, suffix="") -> None: 
+        _, _, train_pairs = prepareData("en", "fr", train_dataset)
 
         print_every = n_iters//10
         plot_every = n_iters//20
@@ -37,7 +43,7 @@ class LSTMMT:
 
         encoder_optimizer = optim.Adagrad(self.encoder.parameters())
         decoder_optimizer = optim.Adagrad(self.decoder.parameters())
-        training_pairs = [tensorsFromPair(random.choice(pairs), self.input_lang, self.output_lang)
+        training_pairs = [tensorsFromPair(random.choice(train_pairs), self.input_lang, self.output_lang)
                         for i in range(n_iters)]
         criterion = nn.CrossEntropyLoss()
 
@@ -61,8 +67,17 @@ class LSTMMT:
                 plot_loss_avg = plot_loss_total / plot_every
                 plot_losses.append(plot_loss_avg)
                 plot_loss_total = 0
-
+        self.save_model(suffix)
         showPlot(plot_losses)
+    
+    def save_model(self, suffix="") -> None:
+        torch.save(self.encoder.state_dict(), 'models/saved_models/encoder_weights'+suffix+'.pth')
+        torch.save(self.decoder.state_dict(), 'models/saved_models/decoder_weights'+suffix+'.pth')
+    
+    
+    def load_model(self, suffix="") -> None:
+        self.encoder.load_state_dict(torch.load('models/saved_models/encoder_weights'+suffix+'.pth'))
+        self.decoder.load_state_dict(torch.load('models/saved_models/decoder_weights'+suffix+'.pth'))
     
     def train_step(self, input_tensor, target_tensor, encoder_optimizer, decoder_optimizer,
         criterion, teacher_forcing_ratio:float=0.5):
@@ -157,6 +172,3 @@ class LSTMMT:
                 decoder_input = topi.squeeze().detach()
             decoded_sentence = ' '.join(decoded_words[:len(decoded_words)-1])
             return decoded_sentence
-
-    def load_model(self) -> None:
-        pass 
