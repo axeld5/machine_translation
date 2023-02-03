@@ -8,7 +8,7 @@ import time
 
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
-from models.cnn_models import CNNDecoder, CNNEncoder, ConvS2S
+from models.conv_models import CNNDecoder, CNNEncoder, ConvS2S
 
 class ConvS2SMT:
 
@@ -19,12 +19,11 @@ class ConvS2SMT:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         
 
-        ENC_EMB_DIM = 256
-        DEC_EMB_DIM = 256
-        ENC_HID_DIM = 512
+        ENC_EMB_DIM = 32
+        DEC_EMB_DIM = 32
+        ENC_HID_DIM = 64
         KERNEL_SIZE = 3
-        DEC_HID_DIM = 512
-        ATTN_DIM = 64
+        DEC_HID_DIM = 64
         ENC_DROPOUT = 0.1
         DEC_DROPOUT = 0.1
         N_LAYERS = 3
