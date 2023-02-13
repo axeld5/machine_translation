@@ -1,13 +1,14 @@
+import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from torchtext.vocab import vocab
-import time
-
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
+
 from models.conv_models import CNNDecoder, CNNEncoder, ConvS2S
 
 class ConvS2SMT:

@@ -8,11 +8,11 @@ from models.transformer import TransformerMT
 from models.lstm import LSTMMT
 from models.lstm_utils import normalizeString
 from bleu_metric import sacrebleu_metric
-from visualise_results import visualize, show_boxplot
+from visualise_results import show_boxplot
 
 print(torch.cuda.is_available())
 if __name__ == "__main__":
-    dataset = load_dataset("tatoeba", lang1 = "en", lang2 = "fr", split=ReadInstruction("train",from_=0, to=100, unit="%", rounding="pct1_dropremainder"))
+    dataset = load_dataset("opus_books", lang1 = "en", lang2 = "fr", split=ReadInstruction("train",from_=0, to=100, unit="%", rounding="pct1_dropremainder"))
     perf_dict = {"model_name":[], "sacrebleu":[]}
     for _ in range(5):
         lstm_model = LSTMMT(hidden_size=1024, max_length=500)
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         lstm_model.init_models()
         split_dataset = dataset.train_test_split(test_size=0.01)
         test_dataset = split_dataset["test"]
-        lstm_model.load_model()
+        lstm_model.load_model("opus")
         
         test = []   
         normalized_test = []    
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         
 
         transformer_model = TransformerMT()
-        transformer_model.load_model()
+        transformer_model.load_model("opus")
 
         transformer_predictions = transformer_model.predict(test)
         transformer_score = sacrebleu_metric(fr_test, transformer_predictions)
@@ -51,4 +51,3 @@ if __name__ == "__main__":
     #perf_dict = {"s2s_lstm": lstm_score['bleu'], "hugface_transformer":transformer_score['bleu']}
     #visualize(perf_dict)
     show_boxplot(perf_dict, x="model_name", y="sacrebleu")
-    

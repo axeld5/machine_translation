@@ -1,11 +1,11 @@
+import torch
+import torch.nn as nn
+
 from torchtext.data.utils import get_tokenizer
 from typing import List
 from timeit import default_timer as timer
-import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
-
 from torchtext.data.utils import get_tokenizer
 from collections import Counter
 from torchtext.vocab import vocab

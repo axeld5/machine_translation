@@ -1,20 +1,7 @@
 from __future__ import unicode_literals, print_function, division
-from datasets import load_dataset, ReadInstruction
-from io import open
-import string
-import unicodedata
-import time 
-import math
-import re
-import random
 import torch
 import torch.nn as nn
-from torch import optim
 import torch.nn.functional as F
-import matplotlib.pyplot as plt
-plt.switch_backend('agg')
-import matplotlib.ticker as ticker
-import numpy as np
 
 class EncoderRNN(nn.Module):
     def __init__(self, input_size, hidden_size, device):

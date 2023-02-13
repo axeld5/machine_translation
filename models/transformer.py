@@ -5,7 +5,6 @@ from joblib import dump, load
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments, Seq2SeqTrainer, DataCollatorForSeq2Seq, pipeline
 from typing import List
 
-
 from .transformer_utils import postprocess_text
 
 class TransformerMT:
@@ -38,7 +37,6 @@ class TransformerMT:
             save_total_limit=3,
             num_train_epochs=n_iters,
             predict_with_generate=True,
-            #fp16=True,
         )
         trainer = Seq2SeqTrainer(
             model=self.model,
