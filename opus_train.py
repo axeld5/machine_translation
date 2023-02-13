@@ -17,7 +17,7 @@ if __name__ == "__main__":
     train_dataset = dataset["train"]
     test_dataset = dataset["test"]
     lstm_model.load_model(suffix="opus")
-    lstm_model.train(train_dataset, 100000, suffix="opus")
+    lstm_model.train(train_dataset, 250000, suffix="opus")
 
     sentence = test_dataset[0]["translation"]["en"]
     lstm_predictions = lstm_model.predict([sentence])

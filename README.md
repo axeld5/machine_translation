@@ -7,6 +7,7 @@ However, due to the low performances of the convS2S and transformer, results for
 
 # training 
 
-To train the models, use opus_train and tatoeba_train.
-To evaluate the models' performance, use opus_main and tatoeba_main.
+To train the models, use "opus_train.py" and "tatoeba_train.py".
+To evaluate the models' performance, use "opus_main.py" and "tatoeba_main.py".
 
+In order to train the models that were not included in the results part of the report, one can still use the "failed_models_train.py" module.

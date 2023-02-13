@@ -8,7 +8,7 @@ from models.transformer import TransformerMT
 from models.lstm import LSTMMT
 from models.lstm_utils import normalizeString
 from bleu_metric import sacrebleu_metric
-from visualise_results import visualize, show_boxplot
+from visualise_results import show_boxplot
 
 print(torch.cuda.is_available())
 if __name__ == "__main__":
@@ -48,7 +48,5 @@ if __name__ == "__main__":
         perf_dict["sacrebleu"].append(transformer_score["bleu"])
 
     print(perf_dict)
-    #perf_dict = {"s2s_lstm": lstm_score['bleu'], "hugface_transformer":transformer_score['bleu']}
-    #visualize(perf_dict)
     show_boxplot(perf_dict, x="model_name", y="sacrebleu")
     

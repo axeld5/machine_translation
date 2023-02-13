@@ -48,6 +48,4 @@ if __name__ == "__main__":
         perf_dict["sacrebleu"].append(transformer_score["bleu"])
 
     print(perf_dict)
-    #perf_dict = {"s2s_lstm": lstm_score['bleu'], "hugface_transformer":transformer_score['bleu']}
-    #visualize(perf_dict)
     show_boxplot(perf_dict, x="model_name", y="sacrebleu")
